@@ -15,7 +15,9 @@
 
 <br>
 
-<img src="docs/demo/demo.gif" width="800" alt="Scroll-through of the UniCore landing page and the architecture section of the docs" />
+<img src="docs/demo/app-demo.gif" width="800" alt="UniCore demo: a provider signs in and detects hardware, a consumer creates a VM, matchmaking picks the provider, a Docker container starts, and the consumer gets a browser SSH shell through the FRP relay" />
+
+<sub>The real provider and consumer apps, run locally with Firebase emulators and a local FRP relay. Provisioning is sped up. <a href="https://github.com/ghbrando/unicore/blob/demo/local-mode/docs/LOCAL_MODE.md">Run it yourself</a>.</sub>
 
 </div>
 
