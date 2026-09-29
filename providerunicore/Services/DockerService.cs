@@ -267,8 +267,9 @@ public class DockerService : IDockerService, IDisposable
             "echo 'consumer:consumer123' | chpasswd && " +
             "echo 'consumer ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && " +
             "sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && " +
-            gcpKeySetup +
-            gcsSetup +
+            // Without a VM agent key the backup job can never authenticate, so skip
+            // installing it; this also shortens VM start-up considerably.
+            (string.IsNullOrWhiteSpace(gcpKeyJson) ? "" : gcpKeySetup + gcsSetup) +
             "chown -R consumer:consumer /home/consumer && " +
             frpSetup + " && " +
             "/usr/sbin/sshd -D"

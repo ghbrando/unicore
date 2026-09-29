@@ -20,8 +20,13 @@ public class FirebaseAuthService : IFirebaseAuthService
     private readonly IHttpClientFactory _httpFactory;
     private readonly string _webApiKey;
 
-    private const string SignInUrl = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=";
-    private const string SignUpUrl = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=";
+    // Local runs set FIREBASE_AUTH_EMULATOR_HOST (e.g. localhost:9099) to use the Auth emulator.
+    private static readonly string? EmulatorHost = Environment.GetEnvironmentVariable("FIREBASE_AUTH_EMULATOR_HOST");
+    private static readonly string IdentityToolkit = EmulatorHost is null
+        ? "https://identitytoolkit.googleapis.com"
+        : $"http://{EmulatorHost}/identitytoolkit.googleapis.com";
+    private static readonly string SignInUrl = $"{IdentityToolkit}/v1/accounts:signInWithPassword?key=";
+    private static readonly string SignUpUrl = $"{IdentityToolkit}/v1/accounts:signUp?key=";
 
     public FirebaseAuthService(IHttpClientFactory httpFactory, IConfiguration config)
     {
@@ -32,7 +37,10 @@ public class FirebaseAuthService : IFirebaseAuthService
         {
             FirebaseApp.Create(new AppOptions
             {
-                Credential = CredentialFactory.FromFile<ServiceAccountCredential>("firebase-service-account.json").ToGoogleCredential()
+                // The Auth emulator accepts any credential.
+                Credential = EmulatorHost is not null
+                    ? GoogleCredential.FromAccessToken("emulator")
+                    : CredentialFactory.FromFile<ServiceAccountCredential>("firebase-service-account.json").ToGoogleCredential()
             });
         }
     }
@@ -75,7 +83,7 @@ public class FirebaseAuthService : IFirebaseAuthService
     {
         var http = _httpFactory.CreateClient();
         var payload = new { requestType = "VERIFY_EMAIL", idToken };
-        var url = "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=" + _webApiKey;
+        var url = $"{IdentityToolkit}/v1/accounts:sendOobCode?key=" + _webApiKey;
         var response = await http.PostAsJsonAsync(url, payload);
         var result = await response.Content.ReadFromJsonAsync<FirebaseRestResponse>()
                     ?? throw new Exception("Invalid response format from Firebase.");
@@ -88,7 +96,7 @@ public class FirebaseAuthService : IFirebaseAuthService
     {
         var http = _httpFactory.CreateClient();
         var payload = new { requestType = "PASSWORD_RESET", email };
-        var url = "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=" + _webApiKey;
+        var url = $"{IdentityToolkit}/v1/accounts:sendOobCode?key=" + _webApiKey;
         var response = await http.PostAsJsonAsync(url, payload);
         var result = await response.Content.ReadFromJsonAsync<FirebaseRestResponse>()
                        ?? throw new Exception("Invalid response format from Firebase.");

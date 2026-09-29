@@ -67,7 +67,12 @@ catch (Exception ex)
 }
 
 // Add Authentication Services
-builder.Services.AddSingleton(FirestoreDb.Create(projectId));
+// Honors FIRESTORE_EMULATOR_HOST for local runs; production is unchanged when it is unset.
+builder.Services.AddSingleton(new FirestoreDbBuilder
+{
+    ProjectId = projectId,
+    EmulatorDetection = Google.Api.Gax.EmulatorDetection.EmulatorOrProduction,
+}.Build());
 builder.Services.AddSingleton<IFirebaseAuthService, FirebaseAuthService>();
 
 // Register Repositories

@@ -1,0 +1,3 @@
+bindPort = 7000
+auth.token = "frp-relay-token"
+allowPorts = [{ start = 2222, end = 2300 }, { start = 8000, end = 8200 }]

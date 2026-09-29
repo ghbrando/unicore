@@ -26,7 +26,12 @@ catch (Exception ex)
 }
 
 // Register Firestore
-builder.Services.AddSingleton(FirestoreDb.Create(projectId));
+// Honors FIRESTORE_EMULATOR_HOST for local runs; production is unchanged when it is unset.
+builder.Services.AddSingleton(new FirestoreDbBuilder
+{
+    ProjectId = projectId,
+    EmulatorDetection = Google.Api.Gax.EmulatorDetection.EmulatorOrProduction,
+}.Build());
 
 // Register repositories (Singleton — worker is long-lived, Firestore client is thread-safe)
 builder.Services.AddFirestoreRepository<UniCore.Shared.Models.Provider>(
