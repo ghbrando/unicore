@@ -13,9 +13,19 @@
 [![Firebase](https://img.shields.io/badge/Firebase-Auth-FFCA28?style=flat-square&logo=firebase)](https://firebase.google.com/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
+<br>
+
+<img src="docs/demo/demo.gif" width="800" alt="Scroll-through of the UniCore landing page and the architecture section of the docs" />
+
 </div>
 
 ---
+
+## Screenshots
+
+| Landing page | How it works: architecture docs |
+|---|---|
+| <img src="docs/demo/landing.png" alt="UniCore landing page" /> | <img src="docs/demo/architecture.png" alt="UniCore docs architecture section: consumer, GCP FRP relay, and Docker container" /> |
 
 ## What is UniCore?
 
