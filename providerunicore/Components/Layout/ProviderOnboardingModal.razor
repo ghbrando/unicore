@@ -216,15 +216,24 @@
         _ => false
     };
 
+    private int _appliedInitialStep = -1;
+
     protected override void OnParametersSet()
     {
-        _step = InitialStep;
+        // Parent re-renders (e.g. Firestore listener updates) must not reset the wizard.
+        // Only resync when the saved step actually changes, and never past the last step.
+        if (InitialStep == _appliedInitialStep) return;
+        _appliedInitialStep = InitialStep;
+        _step = Math.Clamp(InitialStep, 0, TotalSteps - 1);
     }
 
     private async Task GoNext()
     {
         if (!CanAdvance || _saving) return;
         _saving = true;
+        // Capture the target before awaiting: the save triggers a Firestore update that can
+        // re-render this component mid-await, so incrementing afterwards could skip a step.
+        var target = _step + 1;
 
         try
         {
@@ -240,7 +249,7 @@
                 await OnComplete.InvokeAsync();
                 return;
             }
-            _step++;
+            _step = target;
         }
         finally
         {
